@@ -4,6 +4,7 @@ import { users, tweets } from './data.js';
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 app.get('/tweets', (req, res) => {
   const userList = users.data;
@@ -15,6 +16,27 @@ app.get('/tweets', (req, res) => {
   })
 
   res.send(data);
+});
+
+app.post('/sign-up', (req, res) => {
+  const { username, avatar } = req.body;
+
+  if(!username.length || !avatar.length) {
+    res.statusCode = 400;
+    res.send()
+  } else {
+    const checkUsername = users.data.map(user => user.username).includes(username);
+    if(!checkUsername) {
+        users.data.push( {username, avatar} );
+        const data = { message: "User created!" };
+        
+        res.statusCode = 200;
+        res.send(data);
+      } else {
+        res.statusCode = 401;
+        res.send();
+    }
+  }
 });
 
 const PORT = 5000;
