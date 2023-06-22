@@ -29,7 +29,7 @@ app.post('/sign-up', (req, res) => {
     if(!checkUsername) {
         users.data.push( {username, avatar} );
         const data = { message: "User created!" };
-        
+
         res.statusCode = 200;
         res.send(data);
       } else {
@@ -38,6 +38,25 @@ app.post('/sign-up', (req, res) => {
     }
   }
 });
+
+app.post('/tweets', (req, res) => {
+  const { username, tweet } = req.body;
+
+  const checkUsername = users.data.find(user => user.username === username);
+  if(!checkUsername) {
+    res.statusCode === 401;
+    res.send('UNAUTHORIZED');
+  } else if (tweet.length){
+    tweets.data.push( {username, tweet} );
+
+    const data = {message: 'Tweet created!'}
+    res.status = 200;
+    res.send(data);
+  } else {
+    res.statusCode = 400;
+    res.send();
+  }
+})
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
