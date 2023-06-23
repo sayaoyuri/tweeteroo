@@ -21,6 +21,22 @@ app.get('/tweets', (req, res) => {
   res.status(200).send(tweetList);
 });
 
+app.get('/tweets/:USERNAME', (req, res) => {
+  const { USERNAME } = req.params;
+
+  const checkUsername = users.find(user => user.username === USERNAME);
+  if(!checkUsername) return res.status(404).send();
+
+  const userTweets = tweets.filter(tweet => tweet.username === USERNAME).map(tweet => {
+    const user = users.find(user => user.username === USERNAME);
+    tweet.avatar = user.avatar;
+
+    return tweet;
+  });
+
+  return res.status(200).send(userTweets);
+})
+
 app.post('/sign-up', (req, res) => {
   const  { username, avatar } = req.body;
   
