@@ -1,7 +1,3 @@
-export const users = {
-  data: []
-};
+export const users = [];
 
-export const tweets = {
-  data: []
-};
+export const tweets = [];

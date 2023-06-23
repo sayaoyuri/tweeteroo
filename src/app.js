@@ -2,60 +2,51 @@ import express from 'express';
 import cors from 'cors';
 import { users, tweets } from './data.js';
 
+const invalidReq = {
+  message: "Todos os campos são obrigatórios!"
+}
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.get('/tweets', (req, res) => {
-  const userList = users.data;
-  const data = tweets.data.slice(-10).reverse().map(tweet => {
-    const user = userList.find(user => user.username == tweet.username); // need to get the tweet user's avatar
+  const tweetList = tweets.slice(-10).reverse().map(tweet => {
+    const user = users.find(user => user.username == tweet.username); // need to get the tweet user's avatar
     tweet.avatar = user.avatar;
 
     return tweet;
   })
 
-  res.send(data);
+  res.status(200).send(tweetList);
 });
 
 app.post('/sign-up', (req, res) => {
-  const { username, avatar } = req.body;
-
-  if(!username.length || !avatar.length) {
-    res.statusCode = 400;
-    res.send()
-  } else {
-    const checkUsername = users.data.map(user => user.username).includes(username);
-    if(!checkUsername) {
-        users.data.push( {username, avatar} );
-        const data = { message: "User created!" };
-
-        res.statusCode = 200;
-        res.send(data);
-      } else {
-        res.statusCode = 401;
-        res.send();
-    }
+  const  { username, avatar } = req.body;
+  
+  if(!username || !avatar || typeof(username) !== 'string' || typeof(avatar) !== 'string') {
+    return res.status(400).send(invalidReq);
   }
+
+  const checkUsername = users.map(user => user.username).includes(username);
+  if(checkUsername) return res.status(401).send(); 
+
+  users.push( {username, avatar} );
+  return res.status(201).send();
 });
 
 app.post('/tweets', (req, res) => {
   const { username, tweet } = req.body;
 
-  const checkUsername = users.data.find(user => user.username === username);
-  if(!checkUsername) {
-    res.statusCode === 401;
-    res.send('UNAUTHORIZED');
-  } else if (tweet.length){
-    tweets.data.push( {username, tweet} );
-
-    const data = {message: 'Tweet created!'}
-    res.status = 200;
-    res.send(data);
-  } else {
-    res.statusCode = 400;
-    res.send();
+  if(!username || typeof(username) !== 'string' || !tweet || typeof(tweet) !== 'string') {
+    return res.status(400).send(invalidReq)
   }
+
+  const checkUsername = users.find(user => user.username === username);
+  if(!checkUsername) return res.status(401).send();
+
+  tweets.push( {username, tweet} );
+  res.status(201).send()
 })
 
 const PORT = 5000;
