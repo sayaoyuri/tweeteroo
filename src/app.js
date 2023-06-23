@@ -11,7 +11,17 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/tweets', (req, res) => {
-  const tweetList = tweets.slice(-10).reverse().map(tweet => {
+  const pageSize = 10;
+  let page = req.query.page;
+
+  if(page) {
+    if(isNaN(page) || page < 1 || tweets.length < ((page -1) * pageSize )) return res.status(400).send();
+  } else {
+    page = 1;
+  }
+
+  const aux = [...tweets];
+  const tweetList = aux.reverse().slice((pageSize * (page - 1)), (page * pageSize)).map(tweet => {
     const user = users.find(user => user.username == tweet.username); // need to get the tweet user's avatar
     tweet.avatar = user.avatar;
 
@@ -52,7 +62,7 @@ app.post('/sign-up', (req, res) => {
 });
 
 app.post('/tweets', (req, res) => {
-  const username = JSON.parse(req.headers.user);
+  const username = req.headers.user;
   const { tweet } = req.body;
 
   if(!username || typeof(username) !== 'string' || !tweet || typeof(tweet) !== 'string') {
