@@ -52,7 +52,8 @@ app.post('/sign-up', (req, res) => {
 });
 
 app.post('/tweets', (req, res) => {
-  const { username, tweet } = req.body;
+  const username = JSON.parse(req.headers.user);
+  const { tweet } = req.body;
 
   if(!username || typeof(username) !== 'string' || !tweet || typeof(tweet) !== 'string') {
     return res.status(400).send(invalidReq)
